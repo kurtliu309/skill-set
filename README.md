@@ -13,6 +13,7 @@ identify a machine or a person have been replaced with placeholders (`<HUB>`, `<
 | Path | What it is |
 |---|---|
 | `skills/` | Source files for the skills below |
+| `notes/` | English working notes: the idea / to-do system (`notes/inbox/`), agent dispatch logic and test results (`notes/agent-ops/`), hub hand-off notes. See `notes/README.md` |
 | `kpipe/` | The Houdini pipeline toolkit itself: Python package, HDAs, shelf, `hou_exec.py` (see `kpipe/README.md`) |
 | `agents/` | Subagent definitions for Claude Code |
 | `global/` | A global `CLAUDE.md` and the default engineering docs it references |
@@ -35,6 +36,12 @@ identify a machine or a person have been replaced with placeholders (`<HUB>`, `<
 The skills `houdini-kpipe` and `houdini-mcp-conventions` describe how to use kpipe; the toolkit
 itself (scripts and components) is in [`kpipe/`](kpipe/README.md) and packaged on its own as
 `dist/kpipe.zip`. In the skills, `<HOUDINI>/pipeline` means the `kpipe/pipeline` folder.
+
+### Idea / to-do system
+
+The running idea log and to-do list is in [`notes/inbox/`](notes/inbox/INDEX.md): one file to append to,
+statuses instead of deletions, and a separate page for each idea that grows. See
+[`notes/README.md`](notes/README.md). The agent dispatch notes are in [`notes/agent-ops/`](notes/agent-ops/INDEX.md).
 
 ### Placeholders
 
@@ -101,7 +108,8 @@ Python 3.11+ is required for the hub tools. They use only the standard library.
 
 ## What is deliberately not included
 
-- Personal notes, research notes, ideas and pitfall logs.
+- Research notes and the generated hub map (`map.html`), which list private note titles.
+- Notes about other private projects (the downloader app, for example).
 - Assistant memory files.
 - Private project code or data.
 - Credentials, cookies, tokens.
