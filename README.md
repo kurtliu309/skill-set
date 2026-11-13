@@ -103,3 +103,7 @@ Python 3.11+ is required for the hub tools. They use only the standard library.
 
 Shared from a personal Claude Code workspace. Repository:
 https://github.com/kurtliu309/skill-set
+
+## License
+
+MIT, see `LICENSE`. Files under `third-party/` keep their own license (`third-party/mattpocock-skills/LICENSE`, also MIT).
