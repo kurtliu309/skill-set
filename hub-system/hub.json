@@ -1,0 +1,8 @@
+{
+  "include": ["."],
+  "skip_dirs": ["_archive", "tools", ".git"],
+  "frontmatter_exempt": [],
+  "root_entries": ["INDEX.md"],
+  "skill_links": "~/.claude/skills",
+  "skill_links_ignore": ["synced", ".trash"]
+}

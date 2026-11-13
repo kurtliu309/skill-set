@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hub hierarchy</title>
+<style>
+:root{
+  --bg:#f6f5f1;--panel:#ffffff;--ink:#1d1f23;--muted:#6b7078;--line:#dcd9d0;--hover:#eeece5;--sel:#e3e9f6;
+  --entry:#b4532a;--index:#2f5fb3;--note:#2e7d5b;--skill:#7a4bb0;--project:#a0741a;--file:#7b8088;--missing:#c0392b;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#15171b;--panel:#1e2126;--ink:#e8e8e6;--muted:#9aa0a8;--line:#30343b;--hover:#262a31;--sel:#27344d;
+  --entry:#e58a5e;--index:#7ea6ee;--note:#6cc49b;--skill:#b693e6;--project:#d9ad52;--file:#9aa0a8;--missing:#ef6b5b;}
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,sans-serif;display:flex;flex-direction:column}
+header{padding:14px 16px 10px;border-bottom:1px solid var(--line);background:var(--panel)}
+h1{font-size:18px;margin:0 0 2px}
+.sub{color:var(--muted);font-size:12.5px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+input[type=search]{flex:1 1 180px;min-width:0;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+button{padding:7px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;cursor:pointer}
+button:hover{background:var(--hover)}
+.legend{display:flex;gap:6px 12px;flex-wrap:wrap;margin-top:10px;font-size:12.5px;color:var(--muted)}
+.legend label{display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none}
+.legend input{margin:0}
+.dot{width:10px;height:10px;border-radius:3px;display:inline-block;flex:none}
+main{flex:1;display:flex;min-height:0}
+#tree{flex:1;overflow:auto;padding:10px 12px 40px}
+#detail{width:360px;flex:none;border-left:1px solid var(--line);background:var(--panel);padding:16px;overflow:auto}
+ul{list-style:none;margin:0;padding-left:18px;border-left:1px solid var(--line)}
+#tree>ul{padding-left:0;border-left:0}
+li{margin:1px 0}
+.row{display:flex;align-items:flex-start;gap:6px;padding:5px 6px;border-radius:7px;cursor:pointer}
+.row:hover{background:var(--hover)}
+.row.sel{background:var(--sel)}
+.tw{width:18px;flex:none;text-align:center;color:var(--muted);font-size:11px;line-height:22px;user-select:none}
+.tag{flex:none;font-size:11px;line-height:18px;padding:0 6px;border-radius:5px;color:#fff;margin-top:2px;white-space:nowrap}
+.txt{min-width:0}
+.t{font-weight:600;overflow-wrap:anywhere}
+.w{color:var(--muted);font-size:12.5px;overflow-wrap:anywhere}
+.n{color:var(--muted);font-weight:400;font-size:12px;margin-left:4px}
+li.closed>ul{display:none}
+li.hide{display:none}
+mark{background:#f2d675;color:#1d1f23;border-radius:2px}
+#detail h2{font-size:16px;margin:8px 0 10px;overflow-wrap:anywhere}
+dl{margin:0}
+dt{color:var(--muted);font-size:12px;margin-top:12px}
+dd{margin:2px 0 0;overflow-wrap:anywhere}
+code{font:12.5px Consolas,monospace;background:var(--bg);padding:2px 5px;border-radius:4px;display:inline-block}
+.empty{color:var(--muted)}
+#close{display:none}
+@media (max-width:760px){
+  #detail{position:fixed;left:0;right:0;bottom:0;width:auto;max-height:55vh;border-left:0;border-top:1px solid var(--line);
+    border-radius:14px 14px 0 0;box-shadow:0 -6px 24px rgba(0,0,0,.18);transform:translateY(105%);transition:transform .2s}
+  #detail.open{transform:none}
+  #close{display:block;float:right}
+  #tree{padding-bottom:60vh}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>Hub hierarchy</h1>
+  <div class="sub">From the global entry down through the indexes, the same path an AI takes when it looks something up. Generated __STAMP__ · <span id="stats"></span></div>
+  <div class="bar">
+    <input id="q" type="search" placeholder="Search title, description, path">
+    <button id="open">Expand all</button>
+    <button id="shut">Collapse to two levels</button>
+  </div>
+  <div class="legend" id="legend"></div>
+</header>
+<main>
+  <div id="tree"></div>
+  <aside id="detail"><button id="close">Close</button><p class="empty">Click any item on the left to see what it is, where it lives and when to read it.</p></aside>
+</main>
+<script>
+const DATA = /*__DATA__*/null;
+const ROLES = {
+  entry:   ["entry", "--entry",   "loaded automatically by the tool; routing only"],
+  index:   ["index", "--index",   "lists what this level holds and when to read it"],
+  note:    ["note", "--note",     "one topic per page"],
+  skill:   ["skill", "--skill",   "executable procedure (local files)"],
+  "skill-ext": ["external skill", "--skill", "skill installed in the app or a plugin; indexed by name only"],
+  project: ["project", "--project", "registered project; content lives in its own folder"],
+  file:    ["file", "--file",     "another file that was linked"],
+  missing: ["missing", "--missing", "indexed but does not exist"],
+};
+const tree = document.getElementById("tree"), detail = document.getElementById("detail");
+const hidden = new Set();
+let selected = null, counts = {};
+
+function el(tag, cls, text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
+
+function render(node, depth){
+  counts[node.role]=(counts[node.role]||0)+1;
+  const li=el("li"); li._node=node; li.dataset.role=node.role;
+  const row=el("div","row");
+  const kids=node.children||[];
+  const tw=el("span","tw",kids.length?"▼":"");
+  const tag=el("span","tag",ROLES[node.role][0]); tag.style.background=`var(${ROLES[node.role][1]})`;
+  const txt=el("div","txt"); const t=el("div","t",node.title);
+  if(kids.length) t.appendChild(el("span","n",`${kids.length} items`));
+  txt.appendChild(t); if(node.when) txt.appendChild(el("div","w",node.when));
+  row.append(tw,tag,txt); li.appendChild(row);
+  row.addEventListener("click",e=>{
+    if(kids.length && (e.target===tw || selected===row)){li.classList.toggle("closed");tw.textContent=li.classList.contains("closed")?"▶":"▼"}
+    show(node,row);
+  });
+  if(kids.length){const ul=el("ul");kids.forEach(k=>ul.appendChild(render(k,depth+1)));li.appendChild(ul);
+    if(depth>=2){li.classList.add("closed");tw.textContent="▶"}}
+  return li;
+}
+
+function show(node,row){
+  if(selected) selected.classList.remove("sel");
+  selected=row; row.classList.add("sel");
+  detail.replaceChildren();
+  const close=el("button",null,"Close"); close.id="close"; close.onclick=()=>detail.classList.remove("open");
+  const tag=el("span","tag",ROLES[node.role][0]); tag.style.background=`var(${ROLES[node.role][1]})`;
+  const dl=el("dl");
+  const add=(k,v,code)=>{if(!v)return;dl.appendChild(el("dt",null,k));const dd=el("dd");dd.appendChild(code?el("code",null,v):document.createTextNode(v));dl.appendChild(dd)};
+  add("What this kind is",ROLES[node.role][2]);
+  add("When to read",node.when);
+  add("Description",node.desc);
+  add("Path",node.path,true);
+  add("Status",[node.status,node.updated&&("updated "+node.updated)].filter(Boolean).join(" · "));
+  add("Length",node.lines?node.lines+" lines":"");
+  add("Next level",(node.children||[]).length?(node.children.length+" items: "+node.children.map(c=>c.title).join(", ")):"");
+  detail.append(close,tag,el("h2",null,node.title),dl);
+  detail.classList.add("open");
+}
+
+function setAll(closed,keepDepth){
+  tree.querySelectorAll("li").forEach(li=>{
+    if(!li.querySelector(":scope>ul"))return;
+    let d=0,p=li.parentElement;while(p&&p!==tree){if(p.tagName==="UL")d++;p=p.parentElement}
+    const c=closed&&d>keepDepth; li.classList.toggle("closed",c);
+    li.querySelector(":scope>.row>.tw").textContent=c?"▶":"▼";
+  });
+}
+
+function filter(){
+  const q=document.getElementById("q").value.trim().toLowerCase();
+  const visit=li=>{
+    const n=li._node; let kid=false;
+    li.querySelectorAll(":scope>ul>li").forEach(c=>{if(visit(c))kid=true});
+    const roleOk=!hidden.has(n.role);
+    const self=roleOk&&(!q||[n.title,n.when,n.desc,n.path].join(" ").toLowerCase().includes(q));
+    const keep=self||kid||(!q&&roleOk&&false);
+    li.classList.toggle("hide",!(q||hidden.size?keep:true));
+    if(q&&kid){li.classList.remove("closed");const tw=li.querySelector(":scope>.row>.tw");if(tw.textContent)tw.textContent="▼"}
+    return keep;
+  };
+  tree.querySelectorAll(":scope>ul>li").forEach(visit);
+}
+
+const root=el("ul"); root.appendChild(render(DATA,0)); tree.appendChild(root);
+const total=Object.values(counts).reduce((a,b)=>a+b,0);
+document.getElementById("stats").textContent=`${total} nodes in total`;
+const legend=document.getElementById("legend");
+Object.entries(ROLES).forEach(([key,[name,color]])=>{
+  if(!counts[key])return;
+  const label=el("label"); const cb=el("input"); cb.type="checkbox"; cb.checked=true;
+  cb.onchange=()=>{cb.checked?hidden.delete(key):hidden.add(key);filter()};
+  const dot=el("span","dot"); dot.style.background=`var(${color})`;
+  label.append(cb,dot,document.createTextNode(`${name} ${counts[key]}`)); legend.appendChild(label);
+});
+document.getElementById("q").addEventListener("input",filter);
+document.getElementById("open").onclick=()=>setAll(false,0);
+document.getElementById("shut").onclick=()=>setAll(true,1);
+</script>
+</body>
+</html>
