@@ -1,0 +1,14 @@
+{
+    "env": [
+        {
+            "KPIPE": "<PATH-TO>/pipeline"
+        },
+        {
+            "PYTHONPATH": {
+                "value": "$KPIPE/python",
+                "method": "prepend"
+            }
+        }
+    ],
+    "path": "$KPIPE"
+}

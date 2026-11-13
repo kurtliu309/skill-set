@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shelfDocument>
+  <toolshelf name="kpipe" label="KPipe">
+    <memberTool name="kpipe_create"/>
+    <memberTool name="kpipe_open_work_file"/>
+    <memberTool name="kpipe_scene_manager"/>
+    <memberTool name="kpipe_save_version"/>
+    <memberTool name="kpipe_snapshot"/>
+    <memberTool name="kpipe_shot_wedge"/>
+    <memberTool name="kpipe_shot_value"/>
+    <memberTool name="kpipe_reload"/>
+  </toolshelf>
+
+  <tool name="kpipe_create" label="Create" icon="SHELF_new_scene">
+    <helpText><![CDATA[Create projects, shots and first work files.]]></helpText>
+    <script scriptType="python"><![CDATA[import kpipe.ui; kpipe.ui.create()]]></script>
+  </tool>
+
+  <tool name="kpipe_open_work_file" label="Open Work File" icon="BUTTONS_open">
+    <helpText><![CDATA[Browse projects, shots / assets and their versions, and open a work file.]]></helpText>
+    <script scriptType="python"><![CDATA[import kpipe.ui; kpipe.ui.open_work_file()]]></script>
+  </tool>
+
+  <tool name="kpipe_scene_manager" label="Scene Manager" icon="MISC_python">
+    <helpText><![CDATA[Create or select /obj/scene_manager (current project / shot and live variables).]]></helpText>
+    <script scriptType="python"><![CDATA[import kpipe.ui; kpipe.ui.scene_manager()]]></script>
+  </tool>
+
+  <tool name="kpipe_save_version" label="Save Version" icon="BUTTONS_save">
+    <helpText><![CDATA[Save the scene as the next version of the current shot.]]></helpText>
+    <script scriptType="python"><![CDATA[import kpipe.ui; kpipe.ui.save_version()]]></script>
+  </tool>
+
+  <tool name="kpipe_snapshot" label="Snapshot" icon="MISC_flipbook">
+    <helpText><![CDATA[Flipbook the current viewport frame and copy the image to the clipboard.]]></helpText>
+    <script scriptType="python"><![CDATA[import kpipe.ui; kpipe.ui.snapshot()]]></script>
+  </tool>
+
+  <tool name="kpipe_shot_wedge" label="Shot Wedge" icon="TOP_wedge">
+    <helpText><![CDATA[Build a TOP template that caches once per shot (Wedge -> ROP Fetch). Select a Labs File Cache first to wire it in.]]></helpText>
+    <script scriptType="python"><![CDATA[import kpipe.ui; kpipe.ui.shot_wedge()]]></script>
+  </tool>
+
+  <tool name="kpipe_shot_value" label="Shot Value" icon="SOP_attribcreate">
+    <helpText><![CDATA[Create a Shot Value SOP in the current SOP network (also in the Tab menu under KPipe): a default value plus per-shot rules, output as a detail attribute and a Result parm.]]></helpText>
+    <script scriptType="python"><![CDATA[import kpipe.shot_value; kpipe.shot_value.create_here()]]></script>
+  </tool>
+
+  <tool name="kpipe_reload" label="Reload KPipe" icon="BUTTONS_reload">
+    <helpText><![CDATA[Reload the kpipe Python modules, the KPipe HDAs and this shelf after a pipeline update.]]></helpText>
+    <script scriptType="python"><![CDATA[import importlib
+import kpipe
+from kpipe import config, project, scene, create_ui, shot_picker, open_ui, ui, cache, flipbook, tops, shot_value
+for m in (config, project, scene, create_ui, shot_picker, open_ui, ui, cache, flipbook, tops, shot_value):
+    importlib.reload(m)
+hou.hda.reloadFile(config.SM_HDA)
+shot_value.ensure_hda()
+hou.hda.reloadFile(config.SV_HDA)
+scene.start_watch()
+hou.shelves.reloadShelfFiles()
+hou.ui.setStatusMessage("KPipe reloaded")]]></script>
+  </tool>
+</shelfDocument>

@@ -13,6 +13,7 @@ identify a machine or a person have been replaced with placeholders (`<HUB>`, `<
 | Path | What it is |
 |---|---|
 | `skills/` | Source files for the skills below |
+| `kpipe/` | The Houdini pipeline toolkit itself: Python package, HDAs, shelf, `hou_exec.py` (see `kpipe/README.md`) |
 | `agents/` | Subagent definitions for Claude Code |
 | `global/` | A global `CLAUDE.md` and the default engineering docs it references |
 | `hub-system/` | The knowledge / skill management system: protocol, starter tree and tools |
@@ -28,6 +29,12 @@ identify a machine or a person have been replaced with placeholders (`<HUB>`, `<
 | `fetch-and-summarize` | Turn a video (Bilibili, YouTube, anything yt-dlp supports) or a web page into timestamped text, then summarize it. Subtitles first, local Whisper transcription as a fallback. |
 | `houdini-kpipe` | Usage of `kpipe`, a Houdini pipeline toolkit: projects, shots, assets, caching, wedges and the scene manager. |
 | `houdini-mcp-conventions` | Stable working rules for driving Houdini through its MCP server: token-saving practices, hard rules, delivery of flipbooks, wrap-up. Paths and naming defer to `houdini-kpipe`. |
+
+### Where is kpipe?
+
+The skills `houdini-kpipe` and `houdini-mcp-conventions` describe how to use kpipe; the toolkit
+itself (scripts and components) is in [`kpipe/`](kpipe/README.md) and packaged on its own as
+`dist/kpipe.zip`. In the skills, `<HOUDINI>/pipeline` means the `kpipe/pipeline` folder.
 
 ### Placeholders
 
