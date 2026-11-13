@@ -9,7 +9,7 @@ This skill is how to work (stable rules). Things that change do not live here: v
 
 ## 1. Opening (once per conversation)
 1. Load the core tools with a single ToolSearch: `select:mcp__remote-devices__fxhoudini__execute_python,mcp__remote-devices__fxhoudini__get_houdini_connection_status,mcp__remote-devices__fxhoudini__connect_houdini`. Load the other fxhoudini tools only when execute_python cannot do the job, and load as many as you need in one go: every tool definition that is loaded stays in context for the rest of the conversation.
-2. Ports start at 8100 and go up by one per extra instance; one conversation sticks to one port. If Houdini is not responding: ask the user to open Houdini and start the MCP service (start_houdini is not available). If the whole computer connection has dropped: use the device-reconnect-retry skill.
+2. Ports start at 8100 and go up by one per extra instance; one conversation sticks to one port. If Houdini is not responding: ask the user to open Houdini and start the MCP service (start_houdini is not available).
 3. Get the state with a single execute_python call: hip path, hou.hipFile.hasUnsavedChanges(), frame range and FPS, and the node names under /obj (names only).
 
 ## 2. Save tokens (do all of these)

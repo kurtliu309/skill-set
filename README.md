@@ -28,9 +28,6 @@ identify a machine or a person have been replaced with placeholders (`<HUB>`, `<
 | `fetch-and-summarize` | Turn a video (Bilibili, YouTube, anything yt-dlp supports) or a web page into timestamped text, then summarize it. Subtitles first, local Whisper transcription as a fallback. |
 | `houdini-kpipe` | Usage of `kpipe`, a Houdini pipeline toolkit: projects, shots, assets, caching, wedges and the scene manager. |
 | `houdini-mcp-conventions` | Stable working rules for driving Houdini through its MCP server: token-saving practices, hard rules, delivery of flipbooks, wrap-up. Paths and naming defer to `houdini-kpipe`. |
-| `houdini-td-expert` | How to answer Houdini knowledge and troubleshooting questions: conclusion first, exact names, numbers, pitfalls, performance. |
-| `device-reconnect-retry` | When the cloud session loses the connection to the user's computer: ask how often and how long to check, resume the task automatically once the device is back. |
-| `local-mcp-install` | Installing, registering, verifying and troubleshooting a local MCP server on Windows, including where the Microsoft Store build of Claude Desktop reads its config. |
 
 ### Placeholders
 
